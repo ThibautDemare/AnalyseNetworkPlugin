@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import msi.gama.metamodel.agent.IAgent;
+import msi.gama.metamodel.shape.ILocation;
 import msi.gama.metamodel.shape.IShape;
+import msi.gama.metamodel.topology.ITopology;
 import msi.gama.metamodel.topology.filter.In;
 import msi.gama.metamodel.topology.graph.GraphTopology;
 import msi.gama.runtime.GAMA;
@@ -38,11 +40,11 @@ public class Tools {
 	 */
 	public static Graph getGraph(final IScope scope, IGraph gama_graph, String length_attribute, String speed_attribute){
 		Graph graph;
-		if(scope.getSimulationScope().hasAttribute("gaml.extensions.analysenetwork.gs_graph"))
-			graph = (Graph) scope.getSimulationScope().getAttribute("gaml.extensions.analysenetwork.gs_graph");
+		if(scope.getSimulation().hasAttribute("gaml.extensions.analysenetwork.gs_graph"))
+			graph = (Graph) scope.getSimulation().getAttribute("gaml.extensions.analysenetwork.gs_graph");
 		else
 			graph = Tools.getGraphstreamGraphFromGamaGraph(gama_graph, scope, length_attribute, speed_attribute);
-		scope.getSimulationScope().setAttribute("gaml.extensions.analysenetwork.gs_graph", graph);
+		scope.getSimulation().setAttribute("gaml.extensions.analysenetwork.gs_graph", graph);
 		return graph;
 	}
 	
@@ -62,7 +64,7 @@ public class Tools {
 		if(gs_agent == null){
 			gs_agent = Tools.connectAgent(gama_graph, graph, gama_agent, scope, default_speed);
 		}
-		scope.getSimulationScope().setAttribute("gaml.extensions.analysenetwork.gs_graph", graph);
+		scope.getSimulation().setAttribute("gaml.extensions.analysenetwork.gs_graph", graph);
 		return gs_agent;
 	}
 	/**
@@ -163,14 +165,17 @@ public class Tools {
 		gs_agent.addAttribute("y", agent.getLocation().getY());
 		gs_agent.addAttribute("gama_agent", agent);
 		agent.setAttribute("gaml.extensions.analysenetwork.gs_node", gs_agent);
-		
+
 		// Get the closest edge
 		GraphTopology gt = (GraphTopology)(Cast.asTopology(scope, gama_graph));
-		IAgent gamaClosestEdge = gt.getAgentClosestTo(scope, agent, In.edgesOf(gt.getPlaces()));
+		ITopology topo = scope.getSimulation().getTopology();
+		final ILocation source = agent.getLocation().copy(scope);
+		IAgent gamaClosestEdge = topo.getAgentClosestTo(scope, source, In.edgesOf(gt.getPlaces()));		
+		
 		Edge gsClosestEdge = (Edge)gamaClosestEdge.getAttribute("gaml.extensions.analysenetwork.graphstream_edge");
 		Node closestNode1 = gsClosestEdge.getNode0();
 		Node closestNode2 = gsClosestEdge.getNode1();
-		
+
 		// Determine the closest point from the agent to the network in order to compute the length from the agent to the two nodes belonging to the edge
 		Coordinate coord = getClosestLocation(new Coordinate(agent.getLocation().getX(), agent.getLocation().getY()), 
 				new Coordinate(closestNode1.getNumber("x"), closestNode1.getNumber("y")),

@@ -22,16 +22,16 @@ public class AnalyseGraphElement {
 	public static Double shimbelIndex(final IScope scope, IAgent gama_agent, IGraph gama_graph, String length_attribute, String speed_attribute, double default_speed) {
 		// Step 1 : get the gs graph associated to the gama graph
 		Graph graph = Tools.getGraph(scope, gama_graph, length_attribute, speed_attribute);
-		
+
 		// Step 2 : get the gs node associated to the agent
-		Node gs_agent =Tools. getNode(scope, gama_agent, gama_graph, graph, default_speed);
+		Node gs_agent = Tools. getNode(scope, gama_agent, gama_graph, graph, default_speed);
 
 		// Step 3: compute the measure
 		ShimbelIndex si = new ShimbelIndex();
 		si.init(graph);
 		si.setWeightAttributeName("gama_time");
 		si.compute(gs_agent);
-		scope.getSimulationScope().setAttribute("gaml.extensions.analysenetworkgs_graph", graph);
+		scope.getSimulation().setAttribute("gaml.extensions.analysenetworkgs_graph", graph);
 		return si.getNodeMeasure(gs_agent);
 	}
 	
