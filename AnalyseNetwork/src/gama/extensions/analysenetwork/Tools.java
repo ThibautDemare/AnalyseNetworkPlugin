@@ -85,8 +85,8 @@ public class Tools {
 			if ( v instanceof IAgent ) {
 				IAgent a = (IAgent) v;
 				n.addAttribute("gama_agent", a);
-				for ( Object key : a.getAttributes().keySet() ) {
-					Object value = GraphUtilsGraphStream.preprocessGamaValue(a.getAttributes().get(key));
+				for ( Object key : a.getOrCreateAttributes().keySet() ) {
+					Object value = GraphUtilsGraphStream.preprocessGamaValue(a.getOrCreateAttributes().get(key));
 					if(value != null)
 						n.addAttribute(key.toString(), value.toString());
 				}
@@ -111,8 +111,8 @@ public class Tools {
 					IAgent a = (IAgent) edgeObj;
 					// e know a
 					e.addAttribute("gama_agent", a);
-					for ( Object key : a.getAttributes().keySet() ) {
-						Object value = GraphUtilsGraphStream.preprocessGamaValue(a.getAttributes().get(key));
+					for ( Object key : a.getOrCreateAttributes().keySet() ) {
+						Object value = GraphUtilsGraphStream.preprocessGamaValue(a.getOrCreateAttributes().get(key));
 						if(value != null)
 							e.addAttribute(key.toString(), value.toString());
 					}
